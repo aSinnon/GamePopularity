@@ -1,0 +1,27 @@
+{% extends "shared_layout.html" %}
+
+{% block title %}Início{% endblock %}
+
+{% block content %}
+<section>
+    <h2>Enviar arquivo CSV</h2>
+    <p>Envie um CSV para atualizar a análise dos dados.</p>
+
+    <form action="{{ url_for('upload_csv') }}" method="POST" enctype="multipart/form-data">
+        <input type="file" name="arquivo" accept=".csv,text/csv" required>
+        <button type="submit">Enviar CSV</button>
+    </form>
+
+    {% if arquivo_recebido %}
+        <p>Já existe um CSV enviado ({{ tamanho_upload }} MB).</p>
+        <a class="link-button" href="{{ url_for('analise') }}">Abrir análise</a>
+    {% endif %}
+</section>
+
+<section>
+    <h3>Colunas obrigatorias</h3>
+    <p class="ajuda">O arquivo precisa conter estas colunas:</p>
+    <p><strong>Name, Target, Price, Text, Audio, Mac, Linux, Developers, Publishers, Categories</strong></p>
+    <p class="ajuda">O CSV original é guardado sem alterações. A limpeza é feita em uma cópia.</p>
+</section>
+{% endblock %}

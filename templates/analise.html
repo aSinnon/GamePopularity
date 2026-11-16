@@ -1,0 +1,96 @@
+{% extends "shared_layout.html" %}
+
+{% block title %}Análise{% endblock %}
+
+{% block content %}
+<section>
+    <h2>Análise dos dados</h2>
+    <a class="link-button" href="{{ url_for('analise') }}">Atualizar análise e gráficos</a>
+</section>
+
+{% if erro %}
+    <section><p class="erro">{{ erro }}</p></section>
+{% elif resumo and relatorio %}
+    <section>
+        <h3>Resumo da limpeza</h3>
+        <div class="resumo">
+            <div>Linhas originais<strong>{{ resumo.linhas_originais }}</strong></div>
+            <div>Colunas<strong>{{ resumo.colunas_originais }}</strong></div>
+            <div>Linhas após limpeza<strong>{{ resumo.linhas_finais }}</strong></div>
+            <div>Linhas removidas<strong>{{ resumo.linhas_originais - resumo.linhas_finais }}</strong></div>
+        </div>
+        <p class="ajuda">
+            Duplicadas removidas: {{ resumo.duplicadas_removidas }}.
+            Campos vazios: {{ resumo.vazias_removidas }}.
+            Target 0 - 0: {{ resumo.target_zero_removidos }}.
+            Valores inválidos: {{ resumo.invalidas_removidas }}.
+        </p>
+        {% if resumo.ausentes_por_coluna %}
+            <p><strong>Valores ausentes encontrados:</strong></p>
+            <ul>
+                {% for coluna, quantidade in resumo.ausentes_por_coluna.items() %}
+                    <li>{{ coluna }}: {{ quantidade }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Não foram encontrados valores ausentes nas colunas obrigatórias.</p>
+        {% endif %}
+        <p class="ajuda">O CSV original continua em <code>uploads/dataset_atual.csv</code>. A cópia tratada foi salva em <code>{{ caminho_tratado }}</code>.</p>
+    </section>
+
+    <section>
+        <h3>Amostra dos dados tratados</h3>
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr><th>Jogo</th><th>Target</th><th>Preco</th><th>Categories</th><th>Popularidade</th></tr>
+                </thead>
+                <tbody>
+                    {% for item in relatorio.amostra %}
+                        <tr>
+                            <td>{{ item.Name }}</td>
+                            <td>{{ item.Target }}</td>
+                            <td>{{ "%.2f"|format(item.Price) }}</td>
+                            <td>{{ item.Categories }}</td>
+                            <td>{{ item.popularidade }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <h3>1. Distribuição: preços dos jogos</h3>
+        <img class="grafico" src="{{ url_for('static', filename='grafico_distribuicao.png') }}?v={{ versao_grafico }}" alt="Distribuição dos preços dos jogos">
+        <p>{{ relatorio.interpretacoes.preco }}</p>
+    </section>
+
+    <section>
+        <h3>2. Comparação: categorias mais comuns</h3>
+        <img class="grafico" src="{{ url_for('static', filename='grafico_comparacao.png') }}?v={{ versao_grafico }}" alt="Dez categorias mais comuns">
+        <p>{{ relatorio.interpretacoes.categorias }}</p>
+    </section>
+
+    <section>
+        <h3>3. Relação: preço e popularidade</h3>
+        <img class="grafico" src="{{ url_for('static', filename='grafico_relacao.png') }}?v={{ versao_grafico }}" alt="Popularidade dos jogos por faixa de preço">
+        <p>{{ relatorio.interpretacoes.relacao }}</p>
+    </section>
+
+    <section>
+        <h3>Distribuição por popularidade</h3>
+        <div class="tabela">
+            <table>
+                <thead><tr><th>Classe</th><th>Quantidade de jogos</th><th>Percentual</th></tr></thead>
+                <tbody>
+                    {% for item in relatorio.distribuicao_classes %}
+                        <tr><td>{{ item.classe }}</td><td>{{ item.quantidade }}</td><td>{{ item.percentual }}%</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p>{{ relatorio.interpretacoes.popularidade }}</p>
+    </section>
+{% endif %}
+{% endblock %}

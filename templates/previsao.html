@@ -1,0 +1,62 @@
+{% extends "shared_layout.html" %}
+
+{% block title %}Previsão{% endblock %}
+
+{% block content %}
+<section>
+    <h2>Prever popularidade de um jogo</h2>
+    <p>Preencha as características para receber uma previsão.</p>
+
+    <form method="POST" action="{{ url_for('previsao') }}">
+        <p>
+            <label for="Price">Preço:</label><br>
+            <input id="Price" name="Price" type="number" min="0" step="0.01" value="{{ valores.get('Price', '') }}" required>
+        </p>
+        <p>
+            <label for="Text">Quantidade de idiomas em texto:</label><br>
+            <input id="Text" name="Text" type="number" min="0" step="1" value="{{ valores.get('Text', '') }}" required>
+        </p>
+        <p>
+            <label for="Audio">Quantidade de idiomas em áudio:</label><br>
+            <input id="Audio" name="Audio" type="number" min="0" step="1" value="{{ valores.get('Audio', '') }}" required>
+        </p>
+        <p>
+            <label for="Mac">Possui suporte para Mac?</label><br>
+            <select id="Mac" name="Mac" required>
+                <option value="">Selecione</option>
+                <option value="1" {% if valores.get('Mac') == '1' %}selected{% endif %}>Sim</option>
+                <option value="0" {% if valores.get('Mac') == '0' %}selected{% endif %}>Não</option>
+            </select>
+        </p>
+        <p>
+            <label for="Linux">Possui suporte para Linux?</label><br>
+            <select id="Linux" name="Linux" required>
+                <option value="">Selecione</option>
+                <option value="1" {% if valores.get('Linux') == '1' %}selected{% endif %}>Sim</option>
+                <option value="0" {% if valores.get('Linux') == '0' %}selected{% endif %}>Não</option>
+            </select>
+        </p>
+
+        <h3>Categorias</h3>
+        <p class="ajuda">Marque uma ou mais categorias.</p>
+        <div class="lista-categorias" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
+            {% for categoria in opcoes.categories %}
+                <label>
+                    <input type="checkbox" name="Categories" value="{{ categoria }}" {% if categoria in categorias_selecionadas %}checked{% endif %}>
+                    {{ categoria }}
+                </label>
+            {% endfor %}
+        </div>
+
+        <p><button type="submit">Prever popularidade</button></p>
+    </form>
+
+    {% if erro %}
+        <p class="erro">{{ erro }}</p>
+    {% endif %}
+
+    {% if resultado %}
+        <h3>Resultado: {{ resultado }}</h3>
+    {% endif %}
+</section>
+{% endblock %}
